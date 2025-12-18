@@ -54,151 +54,148 @@ from model import (
 # Streamlit Page Config & Custom CSS
 
 st.set_page_config(page_title="Dashboard Ketahanan Pangan", layout="wide")
-
 st.markdown("""
 <style>
+
+/* ===============================
+   COLOR VARIABLES
+================================ */
+:root {
+    --bg-main: #f9fdf7;
+    --bg-card: #ffffff;
+    --bg-soft: #f1f8e9;
+    --text-main: #1f2937;
+    --text-muted: #4b5563;
+    --accent: #2e7d32;
+}
+
+/* DARK MODE */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-main: #0b1220;
+        --bg-card: #020617;
+        --bg-soft: #020617;
+        --text-main: #e5e7eb;
+        --text-muted: #9ca3af;
+        --accent: #4ade80;
+    }
+}
+
+/* ===============================
+   APP BACKGROUND
+================================ */
+html, body, [class*="stApp"] {
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ===============================
+   MAIN CONTAINER
+================================ */
+.main .block-container {
+    padding-top: 2.5rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    max-width: 1200px;
+}
+
+/* ===============================
+   SIDEBAR
+================================ */
+section[data-testid="stSidebar"] {
+    background-color: var(--bg-soft) !important;
+    border-right: 3px solid var(--accent);
+}
+
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2 {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+section[data-testid="stSidebar"] label {
+    font-size: 15px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    color: var(--text-main);
+}
+
+section[data-testid="stSidebar"] label:hover {
+    background-color: rgba(74, 222, 128, 0.15);
+}
+
+section[data-testid="stSidebar"] input:checked + div {
+    background-color: rgba(74, 222, 128, 0.25);
+    font-weight: 600;
+}
+
+/* ===============================
+   CARDS
+================================ */
 .card {
     min-height: 230px;
     padding: 20px;
     border-radius: 15px;
+    background-color: var(--bg-card);
+    color: var(--text-main);
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    transition: transform 0.3s;
 }
-
-.card-blue { background-color: #f0f8ff; }
-.card-gray { background-color: #f5f5f5; }
-.card-green { background-color: #f0fff0; }
-.card-orange { background-color: #fff5ee; }
 
 .card:hover {
-    transform: scale(1.02);
-    transition: 0.3s;
+    transform: scale(1.03);
 }
 
+/* ===============================
+   DESCRIPTION CARD
+================================ */
 .desc-card {
-    background: linear-gradient(135deg, #e8f5e9, #ffffff);
+    background-color: var(--bg-card);
+    color: var(--text-main);
     padding: 25px;
     border-radius: 15px;
-    border-left: 6px solid #2e7d32;
+    border-left: 6px solid var(--accent);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    margin-bottom: 30px;
 }
+
+/* ===============================
+   TEXT
+================================ */
+h1 {
+    color: var(--text-main);
+    font-weight: 800;
+}
+
+h2, h3 {
+    color: var(--accent);
+}
+
+p, li {
+    color: var(--text-muted);
+}
+
+/* ===============================
+   DIVIDER
+================================ */
+hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        var(--accent),
+        transparent
+    );
+    margin: 30px 0;
+}
+
 </style>
 """, unsafe_allow_html=True)
-
-st.markdown(
-    """
-    <style>
-    /* ===============================
-       GLOBAL APP BACKGROUND
-    =============================== */
-    .stApp {
-        background: linear-gradient(180deg, #f9fdf7, #ffffff);
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-    /* ===============================
-       MAIN CONTENT CONTAINER
-    =============================== */
-    .main .block-container {
-        padding-top: 2.5rem;
-        padding-left: 3rem;
-        padding-right: 3rem;
-        max-width: 1200px;
-    }
-
-    /* ===============================
-       SIDEBAR STYLE
-    =============================== */
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #f1f8e9, #ffffff);
-        border-right: 3px solid #2e7d32;
-        padding-top: 15px;
-    }
-
-    /* Sidebar Title */
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3 {
-        color: #1b5e20;
-        font-weight: 700;
-    }
-
-    /* Sidebar Radio Button */
-    section[data-testid="stSidebar"] label {
-        font-size: 15px;
-        padding: 6px 10px;
-        border-radius: 8px;
-        transition: background-color 0.2s ease;
-    }
-
-    /* Hover effect */
-    section[data-testid="stSidebar"] label:hover {
-        background-color: #e8f5e9;
-    }
-
-    /* Active menu highlight */
-    section[data-testid="stSidebar"] input:checked + div {
-        background-color: #c8e6c9;
-        border-radius: 8px;
-        font-weight: 600;
-    }
-
-    /* Space between radio items */
-    section[data-testid="stSidebar"] .stRadio > div {
-        gap: 6px;
-    }
-
-    /* Sidebar footer */
-    .sidebar-footer {
-        text-align: center;
-        font-size: 12px;
-        color: #2e7d32;
-        margin-top: 20px;
-    }
-
-    /* ===============================
-       HEADINGS
-    =============================== */
-    h1 {
-        color: #2e7d32;
-        font-weight: 800;
-    }
-
-    h2, h3 {
-        color: #33691e;
-    }
-
-    /* ===============================
-       DESCRIPTION CARD
-    =============================== */
-    .desc-card {
-        background: linear-gradient(135deg, #e8f5e9, #ffffff);
-        padding: 25px;
-        border-radius: 15px;
-        border-left: 6px solid #2e7d32;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        margin-bottom: 30px;
-    }
-
-    .desc-card h4 {
-        color: #1b5e20;
-        font-weight: 700;
-    }
-
-    /* ===============================
-       DIVIDER
-    =============================== */
-    hr {
-        border: none;
-        height: 1px;
-        background: linear-gradient(to right, #e0e0e0, #c8e6c9, #e0e0e0);
-        margin: 30px 0;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 
 # ===============================================
@@ -698,7 +695,7 @@ elif menu_utama == "📦 Data Wrangling":
                 """
             )
 
-elif menu_utama == "⚙ Preprocessing":
+elif menu_utama == "⚙️ Preprocessing":
 
     st.title("⚙ Tahap Preprocessing Data")
 
@@ -1424,7 +1421,7 @@ elif menu_utama == "🤖 Pemodelan":
 st.sidebar.markdown("---")
 st.sidebar.markdown(
     """
-    <div class="sidebar-footer">
+    <div class="sidebar-footer" style='text-align: center'>
         🌾 <b>IKP Dashboard</b><br>
         Data Science Project <br>
         BY Nur Azizah, Syuk Rina BTE Amiruddin, Cindy Rahmayanti
