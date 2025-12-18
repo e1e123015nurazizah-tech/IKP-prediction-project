@@ -57,42 +57,68 @@ st.set_page_config(page_title="Dashboard Ketahanan Pangan", layout="wide")
 st.markdown("""
 <style>
 
-/* ===============================
-   COLOR VARIABLES
-================================ */
+/* =====================================================
+   GLOBAL COLOR VARIABLES
+===================================================== */
 :root {
+    /* BACKGROUND */
     --bg-main: #f9fdf7;
     --bg-card: #ffffff;
     --bg-soft: #f1f8e9;
+
+    /* TEXT */
     --text-main: #1f2937;
     --text-muted: #4b5563;
+
+    /* TITLE & ACCENT */
+    --title-main: #1b5e20;
     --accent: #2e7d32;
+
+    /* GRADIENTS (LIGHT MODE) */
+    --grad-green: linear-gradient(135deg, #e8f5e9, #ffffff);
+    --grad-blue: linear-gradient(135deg, #e3f2fd, #ffffff);
+    --grad-purple: linear-gradient(135deg,  #ede9fe, #ffffff);
+    --grad-orange: linear-gradient(135deg, #fff3e0, #ffffff);
+
+    --desc-grad: linear-gradient(135deg, #eef7ec, #ffffff);
 }
 
-/* DARK MODE */
+/* =====================================================
+   DARK MODE
+===================================================== */
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-main: #0b1220;
         --bg-card: #020617;
         --bg-soft: #020617;
+
         --text-main: #e5e7eb;
         --text-muted: #9ca3af;
+
+        --title-main: #f8fafc;
         --accent: #4ade80;
+
+        --grad-green: linear-gradient(135deg, #022c22, #020617);
+        --grad-blue: linear-gradient(135deg, #0b1c2d, #020617);
+        --grad-purple: linear-gradient(135deg,  #2e1065, #020617);
+        --grad-orange: linear-gradient(135deg, #2a1606, #020617);
+
+        --desc-grad: linear-gradient(135deg, #020617, #0b1220);
     }
 }
 
-/* ===============================
+/* =====================================================
    APP BACKGROUND
-================================ */
+===================================================== */
 html, body, [class*="stApp"] {
     background-color: var(--bg-main) !important;
     color: var(--text-main) !important;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: "Segoe UI", sans-serif;
 }
 
-/* ===============================
+/* =====================================================
    MAIN CONTAINER
-================================ */
+===================================================== */
 .main .block-container {
     padding-top: 2.5rem;
     padding-left: 3rem;
@@ -100,9 +126,9 @@ html, body, [class*="stApp"] {
     max-width: 1200px;
 }
 
-/* ===============================
+/* =====================================================
    SIDEBAR
-================================ */
+===================================================== */
 section[data-testid="stSidebar"] {
     background-color: var(--bg-soft) !important;
     border-right: 3px solid var(--accent);
@@ -130,72 +156,131 @@ section[data-testid="stSidebar"] input:checked + div {
     font-weight: 600;
 }
 
-/* ===============================
-   CARDS
-================================ */
-.card {
-    min-height: 230px;
-    padding: 20px;
-    border-radius: 15px;
-    background-color: var(--bg-card);
-    color: var(--text-main);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    transition: transform 0.3s;
-}
-
-.card:hover {
-    transform: scale(1.03);
-}
-
-/* ===============================
-   DESCRIPTION CARD
-================================ */
-.desc-card {
-    background-color: var(--bg-card);
-    color: var(--text-main);
-    padding: 25px;
-    border-radius: 15px;
-    border-left: 6px solid var(--accent);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-    margin-bottom: 30px;
-}
-
-/* ===============================
-   TEXT
-================================ */
+/* =====================================================
+   HEADINGS
+===================================================== */
 h1 {
-    color: var(--text-main);
-    font-weight: 800;
+    color: var(--title-main) !important;
+    font-weight: 900;
+    letter-spacing: 0.4px;
 }
 
-h2, h3 {
-    color: var(--accent);
+h2, h3,h4,h5 {
+    color: var(--accent) !important;
 }
 
 p, li {
     color: var(--text-muted);
 }
 
-/* ===============================
+/* =====================================================
+   DESCRIPTION CARD
+===================================================== */
+.desc-card {
+    background: var(--desc-grad);
+    color: var(--text-main);
+    padding: 28px;
+    border-radius: 18px;
+    border-left: 6px solid var(--accent);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.18);
+    margin-bottom: 40px;
+}
+
+/* =====================================================
+   SUMMARY CARDS (RAPIH & SERAGAM)
+===================================================== */
+.card {
+    height: 260px;
+    padding: 26px 24px;
+    border-radius: 18px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    box-shadow: 0 8px 22px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.3);
+}
+
+/* TOP STRIP */
+.card::before {
+    content: "";
+    display: block;
+    height: 5px;
+    border-radius: 12px 12px 0 0;
+    margin: -26px -24px 16px -24px;
+}
+
+/* =====================================================
+   CARD VARIANTS
+===================================================== */
+.card-green {
+    background: var(--grad-green);
+}
+.card-green::before {
+    background-color: var(--accent);
+}
+
+.card-blue {
+    background: var(--grad-blue);
+}
+.card-blue::before {
+    background-color: #3b82f6;
+}
+
+.card-purple {
+    background: var(--grad-purple);
+}
+.card-purple::before {
+    background-color: #8b5cf6;
+}
+
+.card-orange {
+    background: var(--grad-orange);
+}
+.card-orange::before {
+    background-color: #f97316;
+}
+
+/* =====================================================
+   CARD TEXT
+===================================================== */
+.card h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    opacity: 0.85;
+}
+
+.card h2 {
+    margin: 6px 0;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.card p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* =====================================================
    DIVIDER
-================================ */
+===================================================== */
 hr {
     border: none;
     height: 1px;
-    background: linear-gradient(
-        to right,
-        transparent,
-        var(--accent),
-        transparent
-    );
-    margin: 30px 0;
+    background: linear-gradient(to right, transparent, var(--accent), transparent);
+    margin: 35px 0;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
 
 
 # ===============================================
@@ -267,7 +352,7 @@ if menu_utama == "🏠 Home":
 
     with col1:
         st.markdown("""
-        <div class="card card-blue">
+        <div class="card card-blue" style='text-align: center'>
             <h4>📍 Cakupan Wilayah</h4>
             <h2>Kab/Kota Indonesia</h2>
             <p><b>38 Provinsi</b><br>514 Kabupaten/Kota</p>
@@ -276,7 +361,7 @@ if menu_utama == "🏠 Home":
 
     with col2:
         st.markdown("""
-        <div class="card card-gray">
+        <div class="card card-purple" style='text-align: center'>
             <h4>📅 Periode Data</h4>
             <h2>Multi-Tahun</h2>
             <p>Data historis nasional</p>
@@ -285,7 +370,7 @@ if menu_utama == "🏠 Home":
 
     with col3:
         st.markdown("""
-        <div class="card card-green">
+        <div class="card card-green" style='text-align: center'>
             <h4>🤖 Algoritma</h4>
             <h2>3 Model</h2>
             <p>LightGBM<br>CatBoost<br>Gradient Boosting</p>
@@ -294,7 +379,7 @@ if menu_utama == "🏠 Home":
 
     with col4:
         st.markdown("""
-        <div class="card card-orange">
+        <div class="card card-orange" style='text-align: center'>
             <h4>🎯 Target</h4>
             <h2>IKP</h2>
             <p>Indeks Ketahanan Pangan</p>
