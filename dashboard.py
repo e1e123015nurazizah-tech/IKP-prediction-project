@@ -46,11 +46,11 @@ from model import (
     add_cluster_sosial_ekonomi,
     chart_cluster_sosial_ekonomi,
     chart_heatmap_correlation,      
-    build_choropleth_ikp,
     chart_treemap_konsumsi_pangan,
     train_models,
     select_best_model,
     predict_manual,
+    build_choropleth_ikp_plotly,
     CLEANING_FUNCTIONS,
     FEATURES
 
@@ -85,13 +85,128 @@ st.markdown("""
 }
 
 .desc-card {
-    background: linear-gradient(135deg, #e3f2fd, #ffffff);
+    background: linear-gradient(135deg, #e8f5e9, #ffffff);
     padding: 25px;
     border-radius: 15px;
-    border-left: 6px solid #1f77b4;
+    border-left: 6px solid #2e7d32;
 }
 </style>
 """, unsafe_allow_html=True)
+
+st.markdown(
+    """
+    <style>
+    /* ===============================
+       GLOBAL APP BACKGROUND
+    =============================== */
+    .stApp {
+        background: linear-gradient(180deg, #f9fdf7, #ffffff);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* ===============================
+       MAIN CONTENT CONTAINER
+    =============================== */
+    .main .block-container {
+        padding-top: 2.5rem;
+        padding-left: 3rem;
+        padding-right: 3rem;
+        max-width: 1200px;
+    }
+
+    /* ===============================
+       SIDEBAR STYLE
+    =============================== */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #f1f8e9, #ffffff);
+        border-right: 3px solid #2e7d32;
+        padding-top: 15px;
+    }
+
+    /* Sidebar Title */
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3 {
+        color: #1b5e20;
+        font-weight: 700;
+    }
+
+    /* Sidebar Radio Button */
+    section[data-testid="stSidebar"] label {
+        font-size: 15px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        transition: background-color 0.2s ease;
+    }
+
+    /* Hover effect */
+    section[data-testid="stSidebar"] label:hover {
+        background-color: #e8f5e9;
+    }
+
+    /* Active menu highlight */
+    section[data-testid="stSidebar"] input:checked + div {
+        background-color: #c8e6c9;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    /* Space between radio items */
+    section[data-testid="stSidebar"] .stRadio > div {
+        gap: 6px;
+    }
+
+    /* Sidebar footer */
+    .sidebar-footer {
+        text-align: center;
+        font-size: 12px;
+        color: #2e7d32;
+        margin-top: 20px;
+    }
+
+    /* ===============================
+       HEADINGS
+    =============================== */
+    h1 {
+        color: #2e7d32;
+        font-weight: 800;
+    }
+
+    h2, h3 {
+        color: #33691e;
+    }
+
+    /* ===============================
+       DESCRIPTION CARD
+    =============================== */
+    .desc-card {
+        background: linear-gradient(135deg, #e8f5e9, #ffffff);
+        padding: 25px;
+        border-radius: 15px;
+        border-left: 6px solid #2e7d32;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+
+    .desc-card h4 {
+        color: #1b5e20;
+        font-weight: 700;
+    }
+
+    /* ===============================
+       DIVIDER
+    =============================== */
+    hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(to right, #e0e0e0, #c8e6c9, #e0e0e0);
+        margin: 30px 0;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # ===============================================
 # Load Datasets Dari Folder Dataset
@@ -112,12 +227,25 @@ menu_utama = st.sidebar.radio(
     [
         "🏠 Home",
         "📦 Data Wrangling",
-        "⚙ Preprocessing",
+        "⚙️ Preprocessing",
         "📊 EDA",
         "📈 Visualisasi Lanjutan",
         "🤖 Pemodelan"
     ]
 )
+
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    """
+    <div class="sidebar-footer">
+        🌾 <b>IKP Dashboard</b><br>
+        Data Science Project <br>
+        BY Nur Azizah, Syuk Rina BTE Amiruddin, Cindy Rahmayanti
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 
 
 # =========================
@@ -127,10 +255,10 @@ if menu_utama == "🏠 Home":
 
     st.markdown(
         """
-        <h1 style='text-align: center; color: #1f77b4;'>
+        <h1 style='text-align: center; color: #263238;'>
         Prediksi Indeks Ketahanan Pangan (IKP) Kabupaten/Kota di Indonesia
         </h1>
-        <h4 style='text-align: center;'>
+        <h4 style='text-align: center; color:#455a64'>
         Melalui Evaluasi Algoritma LightGBM, CatBoost, dan Gradient Boosting
         </h4>
         """,
@@ -1049,30 +1177,51 @@ elif menu_utama == "📈 Visualisasi Lanjutan":
     # 🗺️ CHOROPLETH MAP
     # =================================================
     elif vis_type == "🗺️ Peta Sebaran IKP":
-
         st.subheader("🗺️ Peta Sebaran Rata-rata IKP Provinsi")
 
         st.markdown(
             """
-            Visualisasi ini menampilkan **rata-rata Indeks Ketahanan Pangan (IKP)** 
-            pada **38 provinsi di Indonesia** menggunakan **choropleth map**.
+            Visualisasi ini menampilkan **rata-rata Indeks Ketahanan Pangan (IKP)**  
+            pada **38 provinsi di Indonesia** menggunakan **choropleth map interaktif**.
             """
         )
 
         # ======================================================
-        # VALIDASI: pastikan preprocessing SUDAH SELESAI
+        # VALIDASI DATA
         # ======================================================
         if "df_preprocessed" not in st.session_state:
             st.warning("⚠️ Silakan selesaikan tahap preprocessing terlebih dahulu.")
             st.stop()
 
         # ======================================================
-        # AMBIL DATA FINAL (INI YANG BENAR)
+        # AMBIL DATA FINAL
         # ======================================================
         df = st.session_state.df_preprocessed.copy()
 
         # ======================================================
-        # SLIDER RENTANG IKP (HANYA UNTUK INTERAKSI)
+        # METRIK RINGKAS
+        # ======================================================
+        col1, col2, col3 = st.columns(3)
+
+        col1.metric(
+            "📊 Rata-rata IKP Nasional",
+            f"{df['ikp'].mean():.2f}"
+        )
+
+        col2.metric(
+            "📈 IKP Tertinggi (Rata-rata Provinsi)",
+            f"{df.groupby('provinsi')['ikp'].mean().max():.2f}"
+        )
+
+        col3.metric(
+            "📉 IKP Terendah (Rata-rata Provinsi)",
+            f"{df.groupby('provinsi')['ikp'].mean().min():.2f}"
+        )
+
+        st.markdown("---")
+
+        # ======================================================
+        # FILTER RENTANG IKP (INTERAKTIF)
         # ======================================================
         min_ikp = float(df["ikp"].min())
         max_ikp = float(df["ikp"].max())
@@ -1090,50 +1239,28 @@ elif menu_utama == "📈 Visualisasi Lanjutan":
         ]
 
         # ======================================================
-        # METRIK RINGKAS
+        # PETA CHOROPLETH (PLOTLY - STABIL)
         # ======================================================
-        c1, c2, c3 = st.columns(3)
-
-        c1.metric(
-            "📊 Rata-rata IKP Nasional",
-            f"{df['ikp'].mean():.2f}"
+        fig = build_choropleth_ikp_plotly(
+        df_merge=df_filtered,
+        geojson_path="Dataset/indonesia-province-simple.json"
         )
 
-        c2.metric(
-            "📈 IKP Tertinggi (Rata-rata Provinsi)",
-            f"{df.groupby('provinsi')['ikp'].mean().max():.2f}"
-        )
-
-        c3.metric(
-            "📉 IKP Terendah (Rata-rata Provinsi)",
-            f"{df.groupby('provinsi')['ikp'].mean().min():.2f}"
-        )
-
-        st.markdown("---")
+        st.plotly_chart(fig, use_container_width=True)
 
         # ======================================================
-        # PETA CHOROPLETH
-        # ======================================================
-        geojson_path = "Dataset/indonesia-province-simple.json"
-
-        chart = build_choropleth_ikp(
-            df_preprocessed=df,      # DATA FINAL HASIL PREPROCESSING
-            geojson_path=geojson_path
-        )
-
-        st.altair_chart(chart, use_container_width=True)
-
-        # ======================================================
-        # INFO
+        # INSIGHT
         # ======================================================
         st.info(
             """
-            📌 **Catatan**
-            - Data peta diambil dari **hasil preprocessing akhir (IQR Capping)**.
-            - Slider hanya digunakan untuk interaksi, **bukan menghitung ulang IKP**.
-            - IKP **tidak diubah** selama preprocessing (sesuai desain).
+            📌 **Insight**
+            - Warna lebih gelap menunjukkan **IKP lebih tinggi**
+            - Terlihat ketimpangan ketahanan pangan antar provinsi
+            - Visualisasi ini mendukung analisis spasial kebijakan pangan
             """
         )
+
+
 
     # =================================================
     # 🔥 HEATMAP KORELASI

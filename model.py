@@ -1,4 +1,3 @@
-# model.py
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -9,17 +8,16 @@ import altair as alt
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import RobustScaler, PowerTransformer
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.ensemble import  GradientBoostingRegressor
 from lightgbm import LGBMRegressor
 from catboost import CatBoostRegressor
-import numpy as np
-import pandas as pd
 import plotly.express as px
 from sklearn.cluster import KMeans
-import pandas as pd
 import json
+import geopandas as gpd
+# ===============================================
 
 DATA_PATH = "Dataset"
 
@@ -452,7 +450,7 @@ def merge_all_datasets(
     df_KEMISKINAN = CLEANING_FUNCTIONS["Kemiskinan"](df_tingkat_kemiskinan)
     df_POLA = CLEANING_FUNCTIONS["Pola Pangan"](df_pola_pangan)
 
-    # 1️⃣ Sosial Ekonomi + Kemiskinan
+    # 1️ Sosial Ekonomi + Kemiskinan
     merge_1 = pd.merge(
         df_SOSIAL,
         df_KEMISKINAN,
@@ -460,7 +458,7 @@ def merge_all_datasets(
         how="outer"
     )
 
-    # 2️⃣ + Pola Pangan
+    # 2️ + Pola Pangan
     merge_2 = pd.merge(
         merge_1,
         df_POLA,
@@ -468,7 +466,7 @@ def merge_all_datasets(
         how="outer"
     )
 
-    # 3️⃣ + Konsumsi Pangan
+    # 3️ + Konsumsi Pangan
     merge_3 = pd.merge(
         merge_2,
         df_KONSUMSI,
@@ -476,7 +474,7 @@ def merge_all_datasets(
         how="outer"
     )
 
-    # 4️⃣ + IKP
+    # 4️ + IKP
     merge_final = pd.merge(
         merge_3,
         df_IKP,
@@ -607,7 +605,7 @@ def handle_missing_values(df_merge: pd.DataFrame):
     cat_cols = df.select_dtypes(include=['object']).columns
 
     # ===============================
-    # 1️⃣ IMPUTASI NUMERIK: MEDIAN PER PROVINSI
+    # 1️ IMPUTASI NUMERIK: MEDIAN PER PROVINSI
     # ===============================
     for col in num_cols:
         df[col] = df.groupby("provinsi")[col].transform(
@@ -615,13 +613,13 @@ def handle_missing_values(df_merge: pd.DataFrame):
         )
 
     # ===============================
-    # 2️⃣ IMPUTASI NUMERIK FINAL: MEDIAN GLOBAL
+    # 2️ IMPUTASI NUMERIK FINAL: MEDIAN GLOBAL
     # ===============================
     for col in num_cols:
         df[col] = df[col].fillna(df[col].median())
 
     # ===============================
-    # 3️⃣ IMPUTASI KATEGORIK: MODUS
+    # 3️ IMPUTASI KATEGORIK: MODUS
     # ===============================
     for col in cat_cols:
         if not df[col].isnull().all():
@@ -636,7 +634,9 @@ def handle_missing_values(df_merge: pd.DataFrame):
     return df, missing_before, missing_after
 
 
-
+# =====================================================
+# OUTLIER FUNCTIONS
+# =====================================================
 def detect_outliers_per_provinsi(df, group_col, cols):
     outlier_results = {}
 
@@ -721,7 +721,7 @@ def summary_dataset(df: pd.DataFrame) -> dict:
 
 
 # =====================================================
-# 1️⃣ IKP vs IPM
+# 1️ IKP vs IPM
 # =====================================================
 def chart_ikp_vs_ipm(df: pd.DataFrame):
     prov_filter = alt.selection_multi(fields=["provinsi"], bind="legend")
@@ -772,7 +772,7 @@ def correlation_ikp_ipm(df: pd.DataFrame) -> float:
     return df["indeks_pembangunan_manusia"].corr(df["ikp"])
 
 # =====================================================
-# EDA 2️⃣ Akses Air & Sanitasi vs IKP
+# EDA 2️ Akses Air & Sanitasi vs IKP
 # =====================================================
 
 def chart_akses_air_vs_ikp(df: pd.DataFrame):
@@ -852,7 +852,7 @@ def chart_akses_dasar_vs_ikp(df: pd.DataFrame):
 
 
 # =====================================================
-# EDA 3️⃣ IKP berdasarkan Kelompok Bahan Pangan
+# EDA 3️ IKP berdasarkan Kelompok Bahan Pangan
 # =====================================================
 
 def chart_ikp_per_kelompok_pangan(df: pd.DataFrame):
@@ -894,7 +894,7 @@ def chart_ikp_per_kelompok_pangan(df: pd.DataFrame):
     return boxplot_group
 
 # =====================================================
-# EDA 4️⃣ – Rata-rata Kemiskinan per Provinsi
+# EDA 4️ Rata-rata Kemiskinan per Provinsi
 # =====================================================
 def chart_avg_kemiskinan_provinsi(df: pd.DataFrame):
     """
@@ -947,7 +947,7 @@ def chart_avg_kemiskinan_provinsi(df: pd.DataFrame):
     return chart
 
 # =====================================================
-# EDA 4️⃣ – PDRB Tertinggi per Provinsi
+# EDA 4️ – PDRB Tertinggi per Provinsi
 # =====================================================
 
 def chart_pdrb_tertinggi_provinsi(df: pd.DataFrame):
@@ -1013,7 +1013,7 @@ import altair as alt
 import pandas as pd
 
 # =====================================================
-# EDA 5️⃣ – Clustering Sosial–Ekonomi & IKP
+# EDA 5️ – Clustering Sosial–Ekonomi & IKP
 # =====================================================
 
 def add_cluster_sosial_ekonomi(
@@ -1116,14 +1116,12 @@ def chart_cluster_sosial_ekonomi(df: pd.DataFrame):
 # VISUALISASI LANJUTAN 1
 # =====================================================
 def chart_treemap_konsumsi_pangan(df: pd.DataFrame):
-    # === AGREGASI DATA (SAMA PERSIS COLAB) ===
     treemap_data = (
         df.groupby(["provinsi", "kelompok_bahan_pangan"])
           .agg(total_konsumsi=("konsumsi_pangan", "sum"))
           .reset_index()
     )
 
-    # === TREEMAP PLOTLY (SAMA PERSIS COLAB) ===
     fig = px.treemap(
         treemap_data,
         path=["provinsi", "kelompok_bahan_pangan"],
@@ -1152,187 +1150,80 @@ def chart_treemap_konsumsi_pangan(df: pd.DataFrame):
 
 
 # =====================================================
-# VISUALISASI LANJUTAN 3 (FINAL - STABIL)
+# VISUALISASI LANJUTAN 2
 # =====================================================
-# model.py
+def build_choropleth_ikp_plotly(df_merge: pd.DataFrame, geojson_path: str):
+    """
+    Choropleth Map IKP Provinsi Indonesia
+    FIX FINAL — MATCH GEOJSON 100%
+    """
 
-import json
-import geopandas as gpd
-import pandas as pd
-import altair as alt
+    # ===============================
+    # 1️ LOAD GEOJSON
+    # ===============================
+    with open(geojson_path, "r", encoding="utf-8") as f:
+        geojson = json.load(f)
 
-def load_geojson(geojson_path: str) -> gpd.GeoDataFrame:
-    gdf = gpd.read_file(geojson_path)
-    if "Propinsi" in gdf.columns:
-        gdf = gdf.rename(columns={"Propinsi": "provinsi"})
-    return gdf
-
-def preprocess_geojson(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    gdf["provinsi_geojson"] = (
-        gdf["provinsi"].astype(str).str.strip().str.lower()
-    )
-    gdf["provinsi_fix"] = gdf["provinsi_geojson"].str.title()
-    return gdf
-
-def preprocess_data(df_merge: pd.DataFrame) -> pd.DataFrame:
-    df = df_merge.copy()
-    df["provinsi_geojson"] = (
-        df["provinsi"].astype(str).str.strip().str.lower()
-    )
-    return df
-
-def create_mapping(geojson_names: set, data_names: set) -> dict:
-    missing = data_names - geojson_names
-    mapping = {}
-
-    for name in missing:
-        guess = name.replace(" ", "").replace(".", "")
-        for g in geojson_names:
-            if guess in g.replace(" ", "").replace(".", ""):
-                mapping[name] = g
-                break
-
-    manual = {
-        "banten": "probanten",
+    # ===============================
+    # 2️ STANDARISASI NAMA PROVINSI (IKUT GEOJSON)
+    # ===============================
+    mapping_prov = {
         "di yogyakarta": "daerah istimewa yogyakarta",
         "yogyakarta": "daerah istimewa yogyakarta",
+        "banten": "probanten",
+        "papua barat": "irian jaya barat",
+        "papua tengah": "irian jaya tengah",
+        "papua timur": "irian jaya timur",
         "nusa tenggara barat": "nusatenggara barat",
-        "nusa tenggara timur": "nusatenggara timur",
-        "aceh": "di. aceh"
+        "nusa tenggara timur": "nusa tenggara timur",
+        "aceh" : "di. aceh"
     }
-    mapping.update(manual)
-    return mapping
 
-def compute_avg_ikp_all(df_preprocessed: pd.DataFrame) -> pd.DataFrame:
-    """
-    Hitung rata-rata IKP per provinsi dari seluruh dataset preprocess.
-    Ini dijalankan hanya sekali, bukan berdasarkan filter slider.
-    """
-    df = preprocess_data(df_preprocessed)
+    df = df_merge.copy()
+
+    df["provinsi_fix"] = (
+        df["provinsi"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        .replace(mapping_prov)
+        .str.upper()            
+    )
+
+    # ===============================
+    # 3️ AGREGASI IKP PER PROVINSI
+    # ===============================
     prov_ikp = (
-        df.groupby("provinsi_geojson", as_index=False)
+        df.groupby("provinsi_fix", as_index=False)
           .agg(avg_ikp=("ikp", "mean"))
     )
-    return prov_ikp
 
-def merge_geo_and_avgikp(
-    gdf: gpd.GeoDataFrame,
-    prov_ikp: pd.DataFrame
-) -> gpd.GeoDataFrame:
-    gdf_merge = gdf.merge(
+    # ===============================
+    # 4️ CHOROPLETH PLOTLY (KUNCI)
+    # ===============================
+    fig = px.choropleth(
         prov_ikp,
-        on="provinsi_geojson",
-        how="left"
-    )
-    return gdf_merge
-
-def debug_matching(
-    gdf_merge: gpd.GeoDataFrame,
-    df_preprocessed: pd.DataFrame
-):
-    geojson_names = set(gdf_merge["provinsi_geojson"].dropna().unique())
-    data_names    = set(df_preprocessed["provinsi"].str.strip().str.lower().unique())
-
-    missing_in_geojson = data_names - geojson_names
-    missing_in_data    = geojson_names - data_names
-
-    print("=== Provinsi di Data IKP tapi TIDAK ada di GeoJSON ===")
-    print(missing_in_geojson)
-    print("=== Provinsi di GeoJSON tapi TIDAK ada di Data IKP ===")
-    print(missing_in_data)
-
-def build_choropleth_ikp(
-    df_preprocessed: pd.DataFrame,
-    geojson_path: str
-):
-    """
-    Peta IKP Provinsi — menghitung rata-rata dari seluruh df_preprocessed.
-    Slider di dashboard hanya untuk highlight, bukan mengubah nilai avg_ikp.
-    """
-
-    # ================================
-    # 1️⃣ Load & Preprocess GeoJSON
-    # ================================
-    gdf = load_geojson(geojson_path)
-    gdf = preprocess_geojson(gdf)
-
-    # ================================
-    # 2️⃣ Preprocess data (normalisasi provinsi)
-    # ================================
-    df_data = preprocess_data(df_preprocessed)
-
-    # ================================
-    # 3️⃣ Mapping nama provinsi
-    # ================================
-    geojson_names = set(gdf["provinsi_geojson"])
-    data_names    = set(df_data["provinsi_geojson"])
-
-    mapping = create_mapping(geojson_names, data_names)
-    df_data["provinsi_geojson"] = df_data["provinsi_geojson"].replace(mapping)
-
-    # ================================
-    # 4️⃣ Hitung rata-rata IKP untuk semua
-    # ================================
-    prov_ikp_all = (
-        df_data
-        .groupby("provinsi_geojson", as_index=False)
-        .agg(avg_ikp=("ikp", "mean"))
+        geojson=geojson,
+        locations="provinsi_fix",              # DATA (UPPERCASE)
+        featureidkey="properties.Propinsi",    # GEOJSON (UPPERCASE)
+        color="avg_ikp",
+        color_continuous_scale="Viridis",
+        hover_name="provinsi_fix",
+        labels={"avg_ikp": "Rata-rata IKP"},
+        title="Peta Sebaran Rata-rata IKP Provinsi Indonesia"
     )
 
-    # ================================
-    # 5️⃣ Merge GeoJSON + IKP
-    # ================================
-    gdf_merge = gdf.merge(
-        prov_ikp_all,
-        on="provinsi_geojson",
-        how="left"
+    fig.update_geos(
+        fitbounds="locations",
+        visible=False
     )
 
-    # ================================
-    # 🔍 Debug: list mismatch (opsional cetak)
-    # ================================
-    # prov di data yg gak match ke GeoJSON
-    not_matched = set(df_data["provinsi_geojson"]) - set(gdf["provinsi_geojson"])
-    print("🚫 Provinsi di data (preprocessed) yang TIDAK match GeoJSON:", not_matched)
-    # prov di geojson yang tidak ada di data
-    extra_geo = set(gdf["provinsi_geojson"]) - set(df_data["provinsi_geojson"])
-    print("ℹ️ Provinsi di GeoJSON tanpa data IKP:", extra_geo)
-
-    # ================================
-    # 6️⃣ Convert to geojson for Altair
-    # ================================
-    geojson_final = json.loads(gdf_merge.to_json())
-
-    # ================================
-    # 7️⃣ Build Altair Choropleth
-    # ================================
-    chart = alt.Chart(
-        alt.Data(values=geojson_final["features"])
-    ).mark_geoshape(
-        stroke="white",
-        strokeWidth=0.4
-    ).encode(
-        color=alt.Color(
-            "properties.avg_ikp:Q",
-            title="Rata-rata IKP",
-            scale=alt.Scale(scheme="viridis")
-        ),
-        tooltip=[
-            alt.Tooltip("properties.provinsi_fix:N", title="Provinsi"),
-            alt.Tooltip("properties.avg_ikp:Q", title="Avg IKP", format=".2f")
-        ]
-    ).project(
-        "mercator"
-    ).properties(
-        title="🗺️ Peta Choropleth IKP Provinsi Indonesia (38 Provinsi)",
-        width=900,
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=50, b=0),
         height=600
     )
 
-    return chart
-
-
-
+    return fig
 
 # =====================================================
 # VISUALISASI LANJUTAN 3
@@ -1369,20 +1260,8 @@ def chart_heatmap_correlation(df: pd.DataFrame):
     return fig
 
 # ============================================
-# MODELING IKP - FINAL & STABIL
+# MODELING IKP 
 # ============================================
-
-import numpy as np
-import pandas as pd
-
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-
-from sklearn.ensemble import GradientBoostingRegressor
-from lightgbm import LGBMRegressor
-from catboost import CatBoostRegressor
-
 
 # ============================================
 # KONFIGURASI FITUR
@@ -1414,7 +1293,6 @@ def evaluate_model(y_true, y_pred):
         "RMSE": np.sqrt(mean_squared_error(y_true, y_pred)),
         "R2": r2_score(y_true, y_pred)
     }
-
 
 # ============================================
 # TRAIN SEMUA MODEL
