@@ -20,6 +20,9 @@ from catboost import CatBoostRegressor
 import plotly.express as px
 from sklearn.cluster import KMeans
 import json
+from textwrap import dedent
+import streamlit.components.v1 as components
+
 # ================================================
 
 # ===============================================
@@ -277,7 +280,7 @@ hr {
     background: linear-gradient(to right, transparent, var(--accent), transparent);
     margin: 35px 0;
 }
-
+            
 </style>
 """, unsafe_allow_html=True)
 
@@ -1474,11 +1477,35 @@ elif menu_utama == "🤖 Pemodelan":
     )
 
     st.divider()
+    # ===============================
+    # 🔮 PREDIKSI IKP MANUAL (INTERAKTIF)
+    # ===============================
+    st.subheader("🔮 Prediksi Indeks Ketahanan Pangan (IKP)")
+
+    st.markdown(
+        "Masukkan nilai indikator sosial-ekonomi di bawah ini untuk "
+        "melakukan **prediksi IKP kabupaten/kota** secara interaktif."
+    )
 
     # ===============================
-    # PREDIKSI MANUAL
+    # 📍 Informasi Wilayah (KONTEKS)
     # ===============================
-    st.subheader("🔮 Prediksi IKP Berdasarkan Input")
+    st.markdown("### 📍 Informasi Wilayah")
+
+    col_w1, col_w2, col_w3 = st.columns(3)
+    with col_w1:
+        provinsi = st.text_input("Provinsi", placeholder="Contoh: Sulawesi Selatan")
+    with col_w2:
+        kabkota = st.text_input("Kabupaten/Kota", placeholder="Contoh: Kota Makassar")
+    with col_w3:
+        tahun = st.number_input("Tahun Prediksi", min_value=2015, max_value=2035, value=2024)
+
+    st.divider()
+
+    # ===============================
+    # 📊 INPUT FITUR
+    # ===============================
+    st.markdown("### 📊 Input Variabel Prediksi")
 
     input_data = {}
     cols = st.columns(2)
@@ -1487,20 +1514,142 @@ elif menu_utama == "🤖 Pemodelan":
         with cols[i % 2]:
             input_data[feat] = st.number_input(
                 feat.replace("_", " ").title(),
-                value=float(df[feat].mean())
+                value=float(df[feat].mean()),
+                help=f"Nilai rata-rata historis: {df[feat].mean():.2f}"
             )
 
-    if st.button("🔮 Prediksi IKP"):
+    # ===============================
+    # 🚀 PROSES PREDIKSI
+    # ===============================
+    if st.button("🚀 Jalankan Prediksi IKP", use_container_width=True):
+
         pred = predict_manual(input_data, best_model, scaler)
 
-        st.success(f"📊 Prediksi IKP: **{pred:.2f}**")
+        # ===============================
+        # 🎯 KATEGORI IKP
+        # ===============================
+        if pred >= 80:
+            kategori = "🟢 Ketahanan Pangan Tinggi"
+            warna = "#14532d"
+        elif pred >= 60:
+            kategori = "🟡 Ketahanan Pangan Sedang"
+            warna = "#854d0e"
+        else:
+            kategori = "🔴 Ketahanan Pangan Rendah"
+            warna = "#7f1d1d"
+
+        # ===============================
+        # 🧠 HASIL PREDIKSI (CARD)
+        # ==============================
+        components.html(
+            dedent(f"""
+            <style>
+                :root {{
+                    --bg-card: #ffffff;
+                    --text-main: #1f2937;
+                    --text-muted: #4b5563;
+                    --accent: #2e7d32;
+                    --divider: rgba(46, 125, 50, 0.4);
+                }}
+
+                @media (prefers-color-scheme: dark) {{
+                    :root {{
+                        --bg-card: #020617;
+                        --text-main: #e5e7eb;
+                        --text-muted: #9ca3af;
+                        --accent: #4ade80;
+                        --divider: rgba(74, 222, 128, 0.4);
+                    }}
+                }}
+
+                body {{
+                    margin: 0;
+                    background: transparent;
+                    font-family: "Segoe UI", sans-serif;
+                }}
+
+                .ikp-card {{
+                    background: var(--bg-card);
+                    padding: 28px;
+                    border-radius: 18px;
+                    border-left: 6px solid var(--accent);
+                    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+                }}
+
+                .ikp-title {{
+                    margin: 0;
+                    font-weight: 800;
+                    color: var(--accent);
+                }}
+
+                .ikp-score {{
+                    margin: 8px 0;
+                    font-size: 42px;
+                    font-weight: 900;
+                    color: var(--accent);
+                }}
+
+                .ikp-status {{
+                    margin: 0;
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: var(--text-main);
+                }}
+
+                .ikp-divider {{
+                    margin: 14px 0;
+                    border: none;
+                    height: 1px;
+                    background: linear-gradient(
+                        to right,
+                        transparent,
+                        var(--divider),
+                        transparent
+                    );
+                }}
+
+                .ikp-meta {{
+                    margin: 0;
+                    font-size: 14px;
+                    color: var(--text-muted);
+                }}
+            </style>
+
+            <div class="ikp-card">
+                <h3 class="ikp-title">📊 Hasil Prediksi IKP</h3>
+                <div class="ikp-score">{pred:.2f}</div>
+                <p class="ikp-status">{kategori}</p>
+                <hr class="ikp-divider">
+                <p class="ikp-meta">
+                    📍 <b>{kabkota}</b>, {provinsi}<br>
+                    📅 Tahun Prediksi: {tahun}
+                </p>
+            </div>
+            """),
+            height=300
+        )
+
+        # ===============================
+        # 🔍 INTERPRETASI SINGKAT
+        # ===============================
+        st.markdown("### 🔍 Interpretasi Singkat")
 
         if pred >= 80:
-            st.info("🟢 Ketahanan Pangan Tinggi")
+            st.success(
+                "Wilayah ini memiliki **ketahanan pangan yang sangat baik**, "
+                "didukung oleh indikator sosial-ekonomi dan akses pangan yang relatif stabil."
+            )
         elif pred >= 60:
-            st.warning("🟡 Ketahanan Pangan Sedang")
+            st.warning(
+                "Ketahanan pangan berada pada **kategori sedang**. "
+                "Perlu perhatian pada variabel kemiskinan, produktivitas pangan, atau akses dasar."
+            )
         else:
-            st.error("🔴 Ketahanan Pangan Rendah")
+            st.error(
+                "Wilayah ini menunjukkan **ketahanan pangan rendah**. "
+                "Diperlukan intervensi kebijakan yang lebih intensif."
+            )
+
 
 
 st.sidebar.markdown("---")
