@@ -1353,7 +1353,7 @@ elif menu_utama == "📈 Visualisasi Lanjutan":
 # ============================
 elif menu_utama == "🤖 Pemodelan":
 
-    st.title("🤖 Pemodelan Prediksi IKP")
+    st.title("🤖 Pemodelan Prediksi Indeks Ketahanan Pangan (IKP) Nasional")
 
     # ===============================
     # CEK DATA
