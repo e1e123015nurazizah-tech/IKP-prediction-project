@@ -227,20 +227,6 @@ menu_utama = st.sidebar.radio(
     ]
 )
 
-st.sidebar.markdown("---")
-st.sidebar.markdown(
-    """
-    <div class="sidebar-footer">
-        🌾 <b>IKP Dashboard</b><br>
-        Data Science Project <br>
-        BY Nur Azizah, Syuk Rina BTE Amiruddin, Cindy Rahmayanti
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-
-
 # =========================
 # HOME
 # =========================
@@ -1433,3 +1419,16 @@ elif menu_utama == "🤖 Pemodelan":
             st.warning("🟡 Ketahanan Pangan Sedang")
         else:
             st.error("🔴 Ketahanan Pangan Rendah")
+
+
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    """
+    <div class="sidebar-footer">
+        🌾 <b>IKP Dashboard</b><br>
+        Data Science Project <br>
+        BY Nur Azizah, Syuk Rina BTE Amiruddin, Cindy Rahmayanti
+    </div>
+    """,
+    unsafe_allow_html=True
+)
