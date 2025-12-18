@@ -841,15 +841,21 @@ elif menu_utama == "⚙️ Preprocessing":
         missing_df = missing_df[missing_df["Jumlah Missing"] > 0]
 
         if not missing_df.empty:
-            import plotly.express as px
             fig = px.bar(
                 missing_df.sort_values("Jumlah Missing", ascending=False),
                 x="Kolom",
                 y="Jumlah Missing",
                 text="Jumlah Missing"
             )
-            fig.update_layout(xaxis_tickangle=-45)
+
+            fig.update_layout(
+                height=650,                
+                xaxis_tickangle=-45,
+                margin=dict(l=40, r=40, t=40, b=120)
+            )
+
             st.plotly_chart(fig, use_container_width=True)
+
         else:
             st.success("🎉 Tidak ada missing value")
 
