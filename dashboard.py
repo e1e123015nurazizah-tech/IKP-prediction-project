@@ -308,7 +308,8 @@ menu_utama = st.sidebar.radio(
         "⚙️ Preprocessing",
         "📊 EDA",
         "📈 Visualisasi Lanjutan",
-        "🤖 Pemodelan"
+        "🤖 Pemodelan",
+        "📖 Cara Penggunaan"
     ]
 )
 
@@ -1656,6 +1657,41 @@ elif menu_utama == "🤖 Pemodelan":
                 "Diperlukan intervensi kebijakan yang lebih intensif."
             )
 
+
+# ==============================
+# cara menggunakan aplikasi
+#
+elif menu_utama == "📖 Cara Penggunaan":
+    st.title("📖 Cara Penggunaan IKP Dashboard")
+    st.markdown(
+        """
+        Selamat datang di **IKP Dashboard**! Berikut panduan singkat
+        untuk menggunakan website ini secara efektif:
+
+        1. **📦 Data Wrangling**  
+        - Mulai dengan tahap *Data Wrangling* untuk melakukan *cleaning* data. (pastikan memilih semua file dataset untuk di cleaning), lihat di tab *Data Wrangling* kemudian pilihh opsi *Cleaning*. 
+        - Setelah itu, jalankan proses *Merge* data untuk menggabungkan informasi dari berbagai sumber dataset, lihat di tab *Data Wrangling* kemudian pilih opsi *Merge*.
+
+        2. **⚙️ Preprocessing**  
+        - Lanjutkan dengan tahap preprocessing untuk menyiapkan data yang sudah bersih.  
+        - Gunakan opsi di sidebar untuk memilih proses tangani missing value dan outlier.
+        - Patikan semua fitur otulier dipilih untuk di proses.
+
+        3. **📊 EDA**  
+        - Lakukan eksplorasi data untuk memahami pola dan hubungan antar variabel.  
+        - Pilih topik EDA dari sidebar untuk melihat visualisasi terkait.
+
+        4. **📈 Visualisasi Lanjutan**  
+        - Jelajahi visualisasi kompleks seperti treemap, peta sebaran, dan heatmap korelasi.  
+        - Gunakan filter interaktif untuk menyesuaikan tampilan data.
+
+        5. **🤖 Pemodelan**  
+        - Latih model prediksi IKP menggunakan data yang telah diproses.  
+        - Evaluasi model berdasarkan metrik performa dan lakukan prediksi manual.
+
+        Nikmati pengalaman analisis data Anda dengan IKP Dashboard!
+        """
+    )
 
 
 st.sidebar.markdown("---")
