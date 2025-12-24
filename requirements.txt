@@ -12,3 +12,5 @@ geopandas
 shapely
 pyproj
 fiona
+streamlit-lottie
+requests
