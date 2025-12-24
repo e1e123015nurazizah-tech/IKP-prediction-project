@@ -22,6 +22,8 @@ from sklearn.cluster import KMeans
 import json
 from textwrap import dedent
 import streamlit.components.v1 as components
+from streamlit_lottie import st_lottie
+import requests
 
 # ================================================
 
@@ -331,24 +333,22 @@ if menu_utama == "🏠 Home":
     )
 
     st.markdown("---")
+    def load_lottieurl(url):
+        r = requests.get(url)
+        if r.status_code != 200:
+            return None
+        return r.json()
 
-    st.markdown("""
-    <div class="desc-card">
-    <h3>📌 Deskripsi Singkat</h3>
+    # Animasi Lottie bertema agriculture/food
+    lottie_food = load_lottieurl("https://assets9.lottiefiles.com/packages/lf20_uc7oVN.json")
 
-    Aplikasi ini dikembangkan untuk menganalisis dan memprediksi  
-    <b>Indeks Ketahanan Pangan (IKP)</b> kabupaten/kota di Indonesia  
-    berdasarkan <b>pertumbuhan ekonomi</b> dan <b>produktivitas pertanian</b>  
-    dengan pendekatan <i>machine learning</i>.
+    col1, col2 = st.columns([2, 1])
 
-    <ul>
-    <li>🎯 Fokus pada ketahanan pangan nasional</li>
-    <li>📊 Analisis berbasis data multi-tahun</li>
-    <li>🤖 Pendekatan Machine Learning modern</li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    with col1:
+        st.markdown(""" <div class="desc-card"> <h3>📌 Deskripsi Singkat</h3> Aplikasi ini dikembangkan untuk menganalisis dan memprediksi <b>Indeks Ketahanan Pangan (IKP)</b> kabupaten/kota di Indonesia berdasarkan <b>pertumbuhan ekonomi</b> dan <b>produktivitas pertanian</b> dengan pendekatan <i>machine learning</i>. <ul> <li>🎯 Fokus pada ketahanan pangan nasional</li> <li>📊 Analisis berbasis data multi-tahun</li> <li>🤖 Pendekatan Machine Learning modern</li> </ul> </div> """, unsafe_allow_html=True)
 
+    with col2:
+        st_lottie(lottie_food, height=280, key="food_anim")
 
     st.markdown("## 📊 Ringkasan Proyek")
 
