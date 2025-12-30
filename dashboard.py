@@ -345,7 +345,16 @@ if menu_utama == "🏠 Home":
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        st.markdown(""" <div class="desc-card"> <h3>📌 Deskripsi Singkat</h3> Aplikasi ini dikembangkan untuk menganalisis dan memprediksi <b>Indeks Ketahanan Pangan (IKP)</b> kabupaten/kota di Indonesia berdasarkan <b>pertumbuhan ekonomi</b> dan <b>produktivitas pertanian</b> dengan pendekatan <i>machine learning</i>. <ul> <li>🎯 Fokus pada ketahanan pangan nasional</li> <li>📊 Analisis berbasis data multi-tahun</li> <li>🤖 Pendekatan Machine Learning modern</li> </ul> </div> """, unsafe_allow_html=True)
+        st.markdown(
+        """ <div class="desc-card"> 
+        <h3>📌 Deskripsi Singkat</h3> 
+        Aplikasi ini dikembangkan untuk menganalisis dan memprediksi <b>Indeks Ketahanan Pangan (IKP)</b> 
+        kabupaten/kota di Indonesia berdasarkan <b>pertumbuhan ekonomi</b> dan <b>produktivitas pertanian</b> 
+        dengan pendekatan <i>machine learning</i>. 
+        <ul> <li>🎯 Fokus pada ketahanan pangan nasional</li> 
+            <li>📊 Analisis berbasis data multi-tahun</li> 
+            <li>🤖 Pendekatan Machine Learning modern</li> 
+        </ul> </div> """, unsafe_allow_html=True)
 
     with col2:
         st_lottie(lottie_food, height=280, key="food_anim")
@@ -1020,7 +1029,7 @@ elif menu_utama == "📊 EDA":
     # =================================================
     # SIDEBAR OPTION
     # =================================================
-    st.sidebar.markdown("### ⚙ Preprocessing Options")
+    st.sidebar.markdown("### EDA Options")
     sub_eda = st.sidebar.selectbox(
         "Pilih Proses:",
         ["IKP vs IPM", "Akses Dasar", "Konsumsi Pangan",
